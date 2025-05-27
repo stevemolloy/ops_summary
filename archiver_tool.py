@@ -284,10 +284,6 @@ def query(start, end, signals, interval='0.1s'):
 
 def main():
     def interval_value(val):
-        if not re.match('\d+\.*\d*[smh]$', str(val)):
-            raise ArgumentTypeError(
-                    'INTERVAL must be a number followed by s, m, h, or d'
-                    )
         return val
 
     parser = ArgumentParser(

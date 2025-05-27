@@ -6,6 +6,7 @@ from datetime import timedelta
 from matplotlib import pyplot as plt
 
 from DowntimeAppTool import delivery_data, downtime_data
+from archiver_tool import get_data
 
 def markdown_header(title: str, author: str, sink: typing.TextIO|None = None):
     if sink is None:
@@ -40,21 +41,21 @@ def main(starttime: dt, endtime: dt):
     R1_downtime: float = sum(d['duration'] for d in R1_faults) / 60
     I_downtime: float = sum(d['duration'] for d in I_faults) / 60
 
-    R3_del: list[int] = [d['R3plan'] for d in delivery]
-    R1_del: list[int] = [d['R1plan'] for d in delivery]
-    I_del: list[int] = [d['SPFplan'] for d in delivery]
+    R3_plan: list[int] = [d['R3plan'] for d in delivery]
+    R1_plan: list[int] = [d['R1plan'] for d in delivery]
+    I_plan: list[int] = [d['SPFplan'] for d in delivery]
 
-    R3_del_hours: int = sum(R3_del)
-    R1_del_hours: int = sum(R1_del)
-    I_del_hours: int = sum(I_del)
+    R3_del: int = sum(R3_plan)
+    R1_del: int = sum(R1_plan)
+    I_del: int = sum(I_plan)
 
-    R3_uptime: float = (R3_del_hours - R3_downtime) / R3_del_hours
-    R1_uptime: float = (R1_del_hours - R1_downtime) / R1_del_hours
-    I_uptime: float = (I_del_hours - I_downtime) / I_del_hours
+    R3_uptime: float = (R3_del - R3_downtime) / R3_del
+    R1_uptime: float = (R1_del - R1_downtime) / R1_del
+    I_uptime: float = (I_del - I_downtime) / I_del
 
-    R3_mtbf: float = R3_del_hours / R3_N
-    R1_mtbf: float = R1_del_hours / R1_N
-    I_mtbf: float = I_del_hours / I_N
+    R3_mtbf: float = R3_del / R3_N
+    R1_mtbf: float = R1_del / R1_N
+    I_mtbf: float = I_del / I_N
 
     R3_mttr: float = R3_downtime / R3_N
     R1_mttr: float = R1_downtime / R1_N
@@ -69,9 +70,9 @@ def main(starttime: dt, endtime: dt):
     print("")
     print(f"| Machine | Delivery | Downtime | Uptime | MTTR | MTBF (days) |")
     print(f"|---------|:--------:|:--------:|:------:|:----:|:-----------:|")
-    print(f"| R3 | {R3_del_hours} | {R3_downtime:0.2f} | {R3_uptime*100:0.2f} | {R3_mttr:0.2f} | {R3_mtbf/24:0.2f} |")
-    print(f"| R1 | {R1_del_hours} | {R1_downtime:0.2f} | {R1_uptime*100:0.2f} | {R1_mttr:0.2f} | {R1_mtbf/24:0.2f} |")
-    print(f"| SPF| {I_del_hours}  | {I_downtime:0.2f}  | {I_uptime*100:0.2f}  | {I_mttr:0.2f}  | {I_mtbf/24:0.2f}  |")
+    print(f"| R3 | {R3_del} | {R3_downtime:0.2f} | {R3_uptime*100:0.2f} | {R3_mttr:0.2f} | {R3_mtbf/24:0.2f} |")
+    print(f"| R1 | {R1_del} | {R1_downtime:0.2f} | {R1_uptime*100:0.2f} | {R1_mttr:0.2f} | {R1_mtbf/24:0.2f} |")
+    print(f"| SPF| {I_del}  | {I_downtime:0.2f}  | {I_uptime*100:0.2f}  | {I_mttr:0.2f}  | {I_mtbf/24:0.2f}  |")
 
     print(f"- R3: MTBF = {R3_mtbf} hours", file=sink)
     print(f"- R1: MTBF = {R1_mtbf} hours", file=sink)
