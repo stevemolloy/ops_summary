@@ -15,9 +15,7 @@ def markdown_header(title: str, author: str, sink: typing.TextIO|None = None):
     print("theme: Malmoe", file=sink)
     print("---", file = sink)
 
-def main(starttime: dt, endtime: dt):
-    print(f"main started: {time.time()}")
-
+def main(starttime: dt, endtime: dt, file: typing.TextIO):
     starttime = starttime.replace(hour=0, minute=0, second=0, microsecond=0)
     endtime = endtime.replace(hour=23, minute=59, second=59, microsecond=1_000_000 - 1)
 
@@ -61,24 +59,45 @@ def main(starttime: dt, endtime: dt):
     R1_mttr: float = R1_dt / R1_N
     I_mttr: float = I_dt / I_N
 
-    sink: typing.TextIO = sys.stdout
-
     title: str = f"Ops report for {starttime.date()} to {endtime.date()}"
     markdown_header(title=title, author="Stephen Molloy", sink=sink)
 
     print(f"# Summary", file=sink)
-    print("")
-    print(f"| Machine | Delivery | Downtime | Uptime | MTTR | MTBF (days) |")
-    print(f"|---------|:--------:|:--------:|:------:|:----:|:-----------:|")
-    print(f"| R3 | {R3_del} | {R3_dt:0.2f} | {R3_ut*100:0.2f} | {R3_mttr:0.2f} | {R3_mtbf/24:0.2f} |")
-    print(f"| R1 | {R1_del} | {R1_dt:0.2f} | {R1_ut*100:0.2f} | {R1_mttr:0.2f} | {R1_mtbf/24:0.2f} |")
-    print(f"| SPF| {I_del}  | {I_dt:0.2f}  | {I_ut*100:0.2f}  | {I_mttr:0.2f}  | {I_mtbf/24:0.2f}  |")
-
-    print(f"- R3: MTBF = {R3_mtbf} hours", file=sink)
-    print(f"- R1: MTBF = {R1_mtbf} hours", file=sink)
-    print(f"- I: MTBF = {I_mtbf} hours", file=sink)
+    print("", file=sink)
+    print(f"| Machine | Delivery | Downtime | Uptime | MTTR | MTBF (days) |", file=sink)
+    print(f"|---------|:--------:|:--------:|:------:|:----:|:-----------:|", file=sink)
+    print(f"| R3 | {R3_del} | {R3_dt:0.2f} | {R3_ut*100:0.2f} | {R3_mttr:0.2f} | {R3_mtbf/24:0.2f} |", file=sink)
+    print(f"| R1 | {R1_del} | {R1_dt:0.2f} | {R1_ut*100:0.2f} | {R1_mttr:0.2f} | {R1_mtbf/24:0.2f} |", file=sink)
+    print(f"| SPF| {I_del}  | {I_dt:0.2f}  | {I_ut*100:0.2f}  | {I_mttr:0.2f}  | {I_mtbf/24:0.2f}  |", file=sink)
     print("", file=sink)
 
+    for n, dump in enumerate(R3_faults):
+        print(f"# R3 downtime {n+1}", file=sink)
+        print("", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Duration: {dump['duration']} minutes", file=sink)
+        print(f"- {dump['description']}", file=sink)
+        print("", file=sink)
+
+    for n, dump in enumerate(R1_faults):
+        print(f"# R1 downtime {n+1}", file=sink)
+        print("", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Duration: {dump['duration']} minutes", file=sink)
+        print(f"- {dump['description']}", file=sink)
+        print("", file=sink)
+
+    for n, dump in enumerate(I_faults):
+        desc: str = dump['description'].replace("\\", "/")
+        print(f"# I downtime {n+1}", file=sink)
+        print("", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Duration: {dump['duration']} minutes", file=sink)
+        print(f"- {desc}", file=sink)
+        print("", file=sink)
+
 if __name__=="__main__":
-    main(dt.now() - timedelta(days=28), dt.now())
+    sink: typing.TextIO = sys.stdout
+
+    main(dt.now() - timedelta(days=28), dt.now(), file=sink)
 
