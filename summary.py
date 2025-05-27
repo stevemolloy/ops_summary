@@ -2,6 +2,9 @@ import sys
 import typing
 from datetime import datetime as dt
 from datetime import timedelta
+
+from matplotlib import pyplot as plt
+
 from DowntimeAppTool import delivery_data, downtime_data
 
 def markdown_header(title: str, author: str, sink: typing.TextIO|None = None):
@@ -57,7 +60,7 @@ def main(starttime: dt, endtime: dt):
     R1_mttr: float = R1_downtime / R1_N
     I_mttr: float = I_downtime / I_N
 
-    sink = sys.stdout
+    sink: typing.TextIO = sys.stdout
 
     title: str = f"Ops report for {starttime.date()} to {endtime.date()}"
     markdown_header(title=title, author="Stephen Molloy", sink=sink)
@@ -73,6 +76,37 @@ def main(starttime: dt, endtime: dt):
     print(f"- R3: MTBF = {R3_mtbf} hours", file=sink)
     print(f"- R1: MTBF = {R1_mtbf} hours", file=sink)
     print(f"- I: MTBF = {I_mtbf} hours", file=sink)
+    print("", file=sink)
+
+    R3_Ib_fname: str = "r3_ib.png"
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3, 4, 5, 6])
+    plt.savefig(R3_Ib_fname)
+
+    R1_Ib_fname: str = "r3_ib.png"
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3, 4, 5, 6])
+    plt.savefig(R1_Ib_fname)
+
+    I_Ib_fname: str = "r3_ib.png"
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3, 4, 5, 6])
+    plt.savefig(I_Ib_fname)
+
+    print(f"# R3 current", file=sink)
+    print("", file=sink)
+    print(f"![]({R3_Ib_fname})", file=sink)
+    print("", file=sink)
+    
+    print(f"# R1 current", file=sink)
+    print("", file=sink)
+    print(f"![]({R1_Ib_fname})", file=sink)
+    print("", file=sink)
+    
+    print(f"# I current", file=sink)
+    print("", file=sink)
+    print(f"![]({I_Ib_fname})", file=sink)
+    print("", file=sink)
     
 if __name__=="__main__":
     main(dt.now() - timedelta(days=28), dt.now())
