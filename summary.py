@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import typing
 from datetime import datetime as dt
@@ -62,7 +64,7 @@ def main(starttime: dt, endtime: dt, file: typing.TextIO):
     title: str = f"Ops report for {starttime.date()} to {endtime.date()}"
     markdown_header(title=title, author="Stephen Molloy", sink=sink)
 
-    print(f"# Summary", file=sink)
+    print(f"# Summary {starttime.date()} to {endtime.date()}", file=sink)
     print("", file=sink)
     print(f"| Machine | Delivery | Downtime | Uptime | MTTR | MTBF (days) |", file=sink)
     print(f"|---------|:--------:|:--------:|:------:|:----:|:-----------:|", file=sink)
@@ -72,32 +74,36 @@ def main(starttime: dt, endtime: dt, file: typing.TextIO):
     print("", file=sink)
 
     for n, dump in enumerate(R3_faults):
-        print(f"# R3 downtime {n+1}", file=sink)
+        print(f"# {dump['machine']} downtime #{n+1}", file=sink)
         print("", file=sink)
-        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Code: {dump['code']}", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
         print(f"- Duration: {dump['duration']} minutes", file=sink)
         print(f"- {dump['description']}", file=sink)
         print("", file=sink)
 
     for n, dump in enumerate(R1_faults):
-        print(f"# R1 downtime {n+1}", file=sink)
+        print(f"# {dump['machine']} downtime #{n+1}", file=sink)
         print("", file=sink)
-        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Code: {dump['code']}", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
         print(f"- Duration: {dump['duration']} minutes", file=sink)
         print(f"- {dump['description']}", file=sink)
         print("", file=sink)
 
     for n, dump in enumerate(I_faults):
         desc: str = dump['description'].replace("\\", "/")
-        print(f"# I downtime {n+1}", file=sink)
+        print(f"# SPF downtime #{n+1}", file=sink)
         print("", file=sink)
-        print(f"- {dump['date'].strftime("%Y-%m-%m %H:%M:%S")}", file=sink)
+        print(f"- Code: {dump['code']}", file=sink)
+        print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
         print(f"- Duration: {dump['duration']} minutes", file=sink)
         print(f"- {desc}", file=sink)
         print("", file=sink)
 
 if __name__=="__main__":
+    WEEKS_SINCE_LAST_MEETING = 5
     sink: typing.TextIO = sys.stdout
 
-    main(dt.now() - timedelta(days=28), dt.now(), file=sink)
+    main(dt.now() - timedelta(days=WEEKS_SINCE_LAST_MEETING*7), dt.now(), file=sink)
 
