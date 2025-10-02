@@ -73,8 +73,9 @@ def main(starttime: dt, endtime: dt, file: typing.TextIO):
     print(f"| SPF| {I_del}  | {I_dt:0.2f}  | {I_ut*100:0.2f}  | {I_mttr:0.2f}  | {I_mtbf/24:0.2f}  |", file=sink)
     print("", file=sink)
 
+    N = len(R3_faults)
     for n, dump in enumerate(R3_faults):
-        print(f"# {dump['machine']} downtime #{n+1}", file=sink)
+        print(f"# {dump['machine']} downtime #{n+1}/{N}", file=sink)
         print("", file=sink)
         print(f"- Code: {dump['code']}", file=sink)
         print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
@@ -82,8 +83,9 @@ def main(starttime: dt, endtime: dt, file: typing.TextIO):
         print(f"- {dump['description']}", file=sink)
         print("", file=sink)
 
+    N = len(R1_faults)
     for n, dump in enumerate(R1_faults):
-        print(f"# {dump['machine']} downtime #{n+1}", file=sink)
+        print(f"# {dump['machine']} downtime #{n+1}/{N}", file=sink)
         print("", file=sink)
         print(f"- Code: {dump['code']}", file=sink)
         print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
@@ -91,9 +93,10 @@ def main(starttime: dt, endtime: dt, file: typing.TextIO):
         print(f"- {dump['description']}", file=sink)
         print("", file=sink)
 
+    N = len(I_faults)
     for n, dump in enumerate(I_faults):
         desc: str = dump['description'].replace("\\", "/")
-        print(f"# SPF downtime #{n+1}", file=sink)
+        print(f"# SPF downtime #{n+1}/{N}", file=sink)
         print("", file=sink)
         print(f"- Code: {dump['code']}", file=sink)
         print(f"- {dump['date'].strftime("%Y-%m-%d %H:%M:%S")}", file=sink)
